@@ -1,6 +1,6 @@
 # This file originates from node2nix
 
-{stdenv, nodejs, python2, utillinux, libtool, runCommand, writeTextFile}:
+{stdenv, nodejs, python2, utillinux, libtool, runCommand, writeTextFile, makeWrapper}:
 
 let
   python = if nodejs ? python then nodejs.python else python2;
@@ -395,7 +395,7 @@ let
     in
     stdenv.mkDerivation ({
       name = "node_${name}-${version}";
-      buildInputs = [ tarWrapper python nodejs ]
+      buildInputs = [ makeWrapper tarWrapper python nodejs ]
         ++ stdenv.lib.optional (stdenv.isLinux) utillinux
         ++ stdenv.lib.optional (stdenv.isDarwin) libtool
         ++ buildInputs;
@@ -421,7 +421,11 @@ let
         # Create symlink to the deployed executable folder, if applicable
         if [ -d "$out/lib/node_modules/.bin" ]
         then
-            ln -s $out/lib/node_modules/.bin $out/bin
+            mkdir "$out/bin"
+            for executable in "$out/lib/node_modules/.bin/"*
+            do
+                makeWrapper "$executable" "$out/bin/$(basename $executable)" --set NODE_PATH "$out/lib/node_modules/${packageName}/node_modules"
+            done
         fi
 
         # Create symlinks to the deployed manual page folders, if applicable
