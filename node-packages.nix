@@ -2173,8 +2173,8 @@ let
       #owner = "yogthos";
       owner = "raboof";
       repo = "mastodon-bot";
-      rev = "cb269db7172bc42554988d9c034550ef553c15ad";
-      sha256 = "1kidyff448r6janqn6rgd5qzg2siqhhlr2awnbsml90pwm0bj1by";
+      rev = "0004cedc22f40e7b7d4c4d6a96ee4ff7ab61673b";
+      sha256 = "08459vbqm9djr8khkrmml1sfd9ld1c9n1wbp7japssxs32rfbb1x";
     };
     # I think we need to hook in at
     # https://github.com/svanderburg/node2nix/blob/master/nix/node-env.nix#L493
