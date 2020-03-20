@@ -18,7 +18,7 @@ Running the image:
 * check `/var/log/lxd/.../lcx.log` to check for output
 
 TODO:
-* Add wrapper that allows mastodon-bot to find its `node_modules`
+* Add wrapper that allows mastodon-bot to find its `node_modules` by setting `NODE_PATH`
 * Edit `configuration.nix` to run the bot with some configuration on image startup
 * move some of the configuration from configuration.nix to default.nix
 * move mastodon-bot packaging to upstream nixpkgs
