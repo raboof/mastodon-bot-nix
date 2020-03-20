@@ -2170,12 +2170,16 @@ let
     packageName = "mastodon-bot";
     version = "0.0.1";
     src = fetchFromGitHub {
-      owner = "yogthos";
+      #owner = "yogthos";
+      owner = "raboof";
       repo = "mastodon-bot";
-      rev = "d72b755485b9ed20fa984aa9781660aa7b6345fa";
-      sha256 = "09j3zdv34idrdr3wy59hp7kk82k220f4ij91fhpcsqnncfyvijr4";
+      rev = "cb269db7172bc42554988d9c034550ef553c15ad";
+      sha256 = "1kidyff448r6janqn6rgd5qzg2siqhhlr2awnbsml90pwm0bj1by";
     };
-    patches = [ ./remove-cljs-from-package-json.diff ];
+    # I think we need to hook in at
+    # https://github.com/svanderburg/node2nix/blob/master/nix/node-env.nix#L493
+    # for this to work?
+    #patches = [ ./remove-cljs-from-package-json.diff ];
     dependencies = [
       sources."acorn-5.7.4"
       (sources."acorn-jsx-3.0.1" // {
