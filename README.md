@@ -10,12 +10,13 @@ Built by:
 * edit node-env.nix to set `NODE_PATH` when running executables
 
 Generate your image by:
-* ../nixos-generator/nixos-generate -f lxc -c configuration.nix; ./nixos-generate -f lxc-metadata -c /tmp/mst/configuration.nix
+* `nixos-generate -f lxc -c configuration.nix; ./nixos-generate -f lxc-metadata -c /tmp/mst/configuration.nix`
+* import it into lxd in one command: `lxc image import $(nixos-generate -f lxc-metadata -c configuration.nix) $(nixos-generate -f lxc -c configuration.nix)`
 
 Running the image:
 * enable `virtualization.lxc.enable` and `virtualization.lxd.enable`
-* 'lxd init' to create the network device
-* use lxc to start the image as documented in nixos-generators
+* 'lxd init' to create the network device and storage pool
+* use lxc to start the image (documented further in nixos-generators)
 
 Troubleshooting:
 * check `/var/log/lxd/.../lcx.log` to check for output on problems
