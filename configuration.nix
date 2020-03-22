@@ -16,24 +16,30 @@ let
   };
 in
 {
-  # This is too early: no network yet...
-  # would be nice to set up the network 'manually' and drop systemd, but one step at a time
-  # boot.postBootCommands = ''MASTODON_BOT_CONFIG=${./config.hack42.edn} ${mastodon-bot}/bin/mastodon-bot'';
+  systemd.targets."posted" = {};
+
   systemd.services."hack42-mastodon-bot" = {
-    wantedBy = [ "multi-user.target" ];
     description = "mastodon-bot with the hack42 configuration";
+
+    requires = [ "network-online.target" ];
     after = [ "network-online.target" ];
+
+    requiredBy = [ "posted.target" ];
+
     unitConfig = {
       DefaultDependencies = false;
     };
+
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = false;
       # To give DNS time to actually initialize :/
       ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
       ExecStart = "${mastodon-bot-hack42}/bin/mastodon-bot";
+      # And wind down after running
+      ExecStop = "${pkgs.systemd}/bin/shutdown -h";
     };
   };
-  #systemd.defaultUnit = "network-online.target";
-}
 
+  systemd.defaultUnit = "posted.target";
+}
