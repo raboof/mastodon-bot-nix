@@ -16,10 +16,6 @@ let
   };
 in
 {
-  environment.systemPackages = [
-    mastodon-bot
-  ];
-
   # This is too early: no network yet...
   # would be nice to set up the network 'manually' and drop systemd, but one step at a time
   # boot.postBootCommands = ''MASTODON_BOT_CONFIG=${./config.hack42.edn} ${mastodon-bot}/bin/mastodon-bot'';
@@ -33,6 +29,8 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = false;
+      # To give DNS time to actually initialize :/
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
       ExecStart = "${mastodon-bot-hack42}/bin/mastodon-bot";
     };
   };

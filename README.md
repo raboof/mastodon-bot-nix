@@ -14,15 +14,16 @@ Generate your image by:
 
 Running the image:
 * enable `virtualization.lxc.enable` and `virtualization.lxd.enable`
+* 'lxd init' to create the network device
 * use lxc to start the image as documented in nixos-generators
-* use 'lxc exec' to run '/nix/store/...-system-path/bin/mastodon-bot'
 
 Troubleshooting:
 * check `/var/log/lxd/.../lcx.log` to check for output on problems
+* check `/var/log/lxd/.../console.log` to check the console output
+* use `lxc exec` to run `systemctl status hack42-mastodon-bot.service` to check bot output
 
 TODO:
-* Edit `configuration.nix` to run the bot with some configuration
-* Edit `configuration.nix` to run the bot on image startup
 * move some of the configuration from configuration.nix to default.nix
 * move mastodon-bot packaging to upstream nixpkgs
 * patch packages.json from .nix instead of pointing to a branch
+* edit `configuration.nix` initialize the network ourselves and avoid systemd
