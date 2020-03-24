@@ -55,6 +55,8 @@ EOF
   };
 in
 {
+  security.rngd.enable = false;
+
   systemd.targets."posted" = {};
 
   systemd.services."hack42-mastodon-bot" = {
