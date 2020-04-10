@@ -1,20 +1,13 @@
 { config, pkgs, lib, ... }:
 
 let
-  mastodon-bot =
-    ((pkgs.callPackage ./. { }).package.overrideAttrs (old: { 
-      buildInputs = old.buildInputs ++ [ pkgs.lumo ];
-      postInstall = ''
-        patchShebangs $out/bin/mastodon-bot
-      '';
-    }));
   mastodon-bot-compiled = pkgs.stdenv.mkDerivation {
     name = "mastodon-bot-compiled";
     unpackPhase = "true";
     buildInputs = [ pkgs.lumo ];
     buildPhase = ''
       # where should the output go? I guess we can't write?
-      cp -r ${mastodon-bot}/lib/node_modules/mastodon-bot/* .
+      cp -r ${pkgs.mastodon-bot}/lib/node_modules/mastodon-bot/* .
       chmod -R a+w *
       cat > build.cljs <<EOF;
       (require '[lumo.build.api :as b])
