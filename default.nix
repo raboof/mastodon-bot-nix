@@ -34,7 +34,7 @@ EOF
       cat > $out/bin/mastodon-bot <<EOF;
       #!/bin/sh
       cd $out/lib
-      NODE_PATH=$out/lib/node_modules ${pkgs.nodejs}/bin/node out/mastodon-bot.js &>/tmp/logs
+      NODE_PATH=$out/lib/node_modules ${pkgs.nodejs}/bin/node out/mastodon-bot.js &>/logs
 EOF
 
       chmod a+x $out/bin/mastodon-bot
@@ -47,7 +47,7 @@ EOF
     postBuild = "wrapProgram $out/bin/mastodon-bot --set MASTODON_BOT_CONFIG ${./config.hack42.edn}";
   };
   initScript = pkgs.writeScript "init" ''
-    #!/bin/sh
+    #!${pkgs.stdenv.shell}
     ${pkgs.dhcp}/bin/dhclient -v eth0
     exec ${mastodon-bot-hack42}/bin/mastodon-bot
   '';
