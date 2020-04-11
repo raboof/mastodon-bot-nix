@@ -6,7 +6,6 @@ let
     unpackPhase = "true";
     buildInputs = [ pkgs.lumo ];
     buildPhase = ''
-      # where should the output go? I guess we can't write?
       cp -r ${pkgs.mastodon-bot}/lib/node_modules/mastodon-bot/* .
       chmod -R a+w *
       cat > build.cljs <<EOF;
@@ -21,35 +20,47 @@ let
 EOF
 
       lumo -c mastodon_bot build.cljs
-      rm out/mastodon_bot/*.cljs
+
+      # Clean up leftovers from compile phase
+      find out -name '*.cljs' | xargs rm
+      find out -name '*.json' | xargs rm
+      find out -name '*.map' | xargs rm
+
+      # Clean up node modules not needed at runtime
+      rm -r node_modules/shadow-cljs-jar
+      rm -r node_modules/source-map
+
+      # Cut ties with the specific version of nodejs
+      rm -r node_modules/acorn/bin
+      rm -r node_modules/buffer/bin
+      rm -r node_modules/*/scripts
+      rm -r node_modules/*/node_modules/*/bin
+      grep -r ${pkgs.nodejs-12_x} node_modules/ | cut -d ":" -f 1 | sort | uniq | xargs rm
     '';
     installPhase = ''
       mkdir -p $out/lib
       cp -r out $out/lib
 
-      # We're copying the node_modules so we don't need a dependency on the 'fat' mastodon-bot
+      # We're copying the node_modules so that we don't need a dependency on the 'fat' mastodon-bot
       cp -r node_modules $out/lib
 
       mkdir -p $out/bin
       cat > $out/bin/mastodon-bot <<EOF;
       #!/bin/sh
       cd $out/lib
-      NODE_PATH=$out/lib/node_modules ${pkgs.nodejs}/bin/node out/mastodon-bot.js &>/logs
+      NODE_PATH=$out/lib/node_modules ${pkgs.nodejs-slim-12_x}/bin/node out/mastodon-bot.js "\$@"
 EOF
 
       chmod a+x $out/bin/mastodon-bot
     '';
   };
-  mastodon-bot-hack42 = pkgs.symlinkJoin {
-    name = "mastodon-bot-hack42";
-    paths = [ mastodon-bot-compiled ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = "wrapProgram $out/bin/mastodon-bot --set MASTODON_BOT_CONFIG ${./config.hack42.edn}";
-  };
   initScript = pkgs.writeScript "init" ''
     #!${pkgs.stdenv.shell}
+
     ${pkgs.dhcp}/bin/dhclient -v eth0
-    exec ${mastodon-bot-hack42}/bin/mastodon-bot
+
+    export MASTODON_BOT_CONFIG=${./config.hack42.edn}
+    exec ${mastodon-bot-compiled}/bin/mastodon-bot
   '';
   lib = pkgs.stdenv.lib;
 in lib.mkForce (pkgs.callPackage (nixpkgs + "/nixos/lib/make-system-tarball.nix") {
@@ -63,5 +74,5 @@ in lib.mkForce (pkgs.callPackage (nixpkgs + "/nixos/lib/make-system-tarball.nix"
     { source = initScript; target = "/init"; }
   ];
   extraArgs = "--owner=0";
-  extraCommands = "mkdir -p proc sys dev";
+  extraCommands = "mkdir -p proc sys dev etc var/db";
 })
