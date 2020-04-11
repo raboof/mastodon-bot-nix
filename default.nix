@@ -1,6 +1,6 @@
-{ config, pkgs, lib, ... }:
-
+{ nixpkgs ? <nixpkgs> }:
 let
+  pkgs = import nixpkgs {}; 
   mastodon-bot-compiled = pkgs.stdenv.mkDerivation {
     name = "mastodon-bot-compiled";
     unpackPhase = "true";
@@ -46,34 +46,22 @@ EOF
     buildInputs = [ pkgs.makeWrapper ];
     postBuild = "wrapProgram $out/bin/mastodon-bot --set MASTODON_BOT_CONFIG ${./config.hack42.edn}";
   };
-in
-{
-  security.rngd.enable = false;
-
-  systemd.targets."posted" = {};
-
-  systemd.services."hack42-mastodon-bot" = {
-    description = "mastodon-bot with the hack42 configuration";
-
-    requires = [ "network-online.target" ];
-    after = [ "network-online.target" ];
-
-    requiredBy = [ "posted.target" ];
-
-    unitConfig = {
-      DefaultDependencies = false;
-    };
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = false;
-      # To give DNS time to actually initialize :/
-      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
-      ExecStart = "${mastodon-bot-hack42}/bin/mastodon-bot";
-      # And wind down after running
-      ExecStop = "${pkgs.systemd}/bin/shutdown -h";
-    };
-  };
-
-  systemd.defaultUnit = "posted.target";
-}
+  initScript = pkgs.writeScript "init" ''
+    #!/bin/sh
+    ${pkgs.dhcp}/bin/dhclient -v eth0
+    exec ${mastodon-bot-hack42}/bin/mastodon-bot
+  '';
+  lib = pkgs.stdenv.lib;
+in lib.mkForce (pkgs.callPackage (nixpkgs + "/nixos/lib/make-system-tarball.nix") {
+  storeContents = [
+    {
+      object = initScript;
+      symlink = "/sbin/init";
+    }
+  ];
+  contents = [
+    { source = initScript; target = "/init"; }
+  ];
+  extraArgs = "--owner=0";
+  extraCommands = "mkdir -p proc sys dev";
+})
