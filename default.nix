@@ -26,16 +26,11 @@ EOF
       find out -name '*.json' | xargs rm
       find out -name '*.map' | xargs rm
 
-      # Clean up node modules not needed at runtime
-      rm -r node_modules/shadow-cljs-jar
-      rm -r node_modules/source-map
-
       # Cut ties with the specific version of nodejs
       rm -r node_modules/acorn/bin
-      rm -r node_modules/buffer/bin
       rm -r node_modules/*/scripts
       rm -r node_modules/*/node_modules/*/bin
-      grep -r ${pkgs.nodejs-12_x} node_modules/ | cut -d ":" -f 1 | sort | uniq | xargs rm
+      grep -r ${pkgs.nodejs} node_modules/ | cut -d ":" -f 1 | sort | uniq | xargs rm
     '';
     installPhase = ''
       mkdir -p $out/lib
