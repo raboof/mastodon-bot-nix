@@ -6,7 +6,7 @@ The image is 42MB (compressed)
 
 ## Usage
 
-You will need the nixpkgs from https://github.com/raboof/nixpkgs/tree/mastodon-bot-init-at-2020-03-22
+You will need the nixpkgs from https://github.com/NixOS/nixpkgs/pull/85234
 
 For further information on how to build and load into LXD, see test.sh
 
