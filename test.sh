@@ -6,12 +6,12 @@ lxc delete --force $(lxc ls | grep CONTAINER | cut -d " " -f 2)
 lxc image delete $(lxc image list | grep CONTAIN | cut -d "|" -f 3)
 
 # https://github.com/raboof/nixpkgs/tree/mastodon-bot-init-at-0.0.1
-export NIX_PATH='nixpkgs=/home/aengelen/nixpkgs-unstable'
+export NIX_PATH='nixpkgs=/home/aengelen/nixpkgs-mastodon-bot'
 
 
 echo $(nix-build)/tarball/nixos-system-x86_64-linux.tar.xz
 
-lxc image import $(nix-build lxc-metadata.nix)/tarball/nixos-system-x86_64-linux.tar.xz $(nix-build --arg config-edn ./hack42.edn)/tarball/mastodon-bot-hack42.edn.tar.xz
+lxc image import $(nix-build lxc-metadata.nix)/tarball/nixos-system-x86_64-linux.tar.xz $(nix-build --arg config-edn ./rb.edn)/tarball/mastodon-bot-rb.edn.tar.xz
 
 lxc launch $(lxc image list | grep CONTAIN | cut -d "|" -f 3) -s pool1
 sudo tail -f /var/log/lxd/$(lxc ls | grep CONTAINER | cut -d " " -f 2)/console.log
