@@ -1,6 +1,7 @@
 {
   nixpkgs ? <nixpkgs>,
-  config-edn ? ./hack42.edn
+  config-edn,
+  credentials-edn
 }:
 
 let
@@ -11,6 +12,7 @@ let
     ${pkgs.dhcp}/bin/dhclient -v eth0
 
     export MASTODON_BOT_CONFIG=${config-edn}
+    export MASTODON_BOT_CREDENTIALS=${credentials-edn}
     exec ${pkgs.mastodon-bot}/bin/mastodon-bot
   '';
   lib = pkgs.stdenv.lib;

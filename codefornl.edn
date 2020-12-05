@@ -1,0 +1,37 @@
+{:transform
+ [{:source {:source-type :twitter
+            ;; optional, defaults to false
+            :include-replies? false
+            ;; optional, defaults to false
+            :include-rts? false
+            ;; accounts you wish to mirror
+            :accounts ["codefornl"]}
+   :target {:target-type :mastodon
+            ;; optional boolean to mark content as sensitive
+            :sensitive? false
+            ;; optional boolean defaults to false
+            ;; only sources containing media will be posted when set to true
+            :media-only? false
+            ;; optional visibility flag: direct, private, unlisted, public
+            ;; defaults to public        
+            :visibility "public"
+            ;; optional limit for the post length
+            :max-post-length 500
+            ;; optional flag specifying wether the name of the account
+            ;; will be appended in the post, defaults to false
+            :append-screen-name? false}
+            ;; optional signature for posts
+            ;;:signature "#newsbot"
+            ;; optionally try to resolve URLs in posts to skip URL shorteners
+            ;; defaults to false
+            :resolve-urls? true
+            ;; optional content filter regexes
+            ;; any posts matching the regexes will be filtered out
+            :content-filters []
+            ;; optional keyword filter regexes
+            ;; any posts not matching the regexes will be filtered out
+            :keyword-filters []
+            ;; optional replacements
+            :replacements {"@OpenOverheidNL" "#OpenOverheidNL",
+                           "@publiccodenet" "#publiccodenet"
+            }}]}
